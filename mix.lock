@@ -1,0 +1,1 @@
+%{"erlzmq": {:git, "https://github.com/zeromq/erlzmq2.git", "be8119254d13500bd01ca2d90637888187299393", []}}
