@@ -4,9 +4,8 @@ defmodule ZmqPublisher do
 	use GenServer
 	alias ZmqInterface.State 
 	
-	@ip "127.0.0.1"
-	@pub_port "20174"
-	@sub_port "20174"
+	@ip "10.1.3.109"
+	@pub_port "31285"
 	
 	# public API
 	def start_link do
@@ -30,8 +29,16 @@ defmodule ZmqPublisher do
 	
 	def handle_cast({:send, msg}, state=%State{publisher: zmq_publisher}) do
 		Logger.debug "ZmqPublisher: handle send... message #{inspect msg}, state #{inspect state}"		
-	  :erlzmq.send(zmq_publisher, msg)		
+	  :erlzmq.send(zmq_publisher, msg)	
+		
+		notify(msg)
+		
 		{:noreply, state}
+	end
+	
+	defp notify(msg) do
+		Logger.debug "ZmqPublisher: notify #{inspect msg}"
+		{:ok, {:zmq_msg, msg}}
 	end
 	
 end
