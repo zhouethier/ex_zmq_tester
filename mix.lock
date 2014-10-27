@@ -1,1 +1,5 @@
-%{"erlzmq": {:git, "https://github.com/zeromq/erlzmq2.git", "be8119254d13500bd01ca2d90637888187299393", []}}
+%{"erlzmq": {:git, "https://github.com/zeromq/erlzmq2.git", "be8119254d13500bd01ca2d90637888187299393", []},
+  "exprotobuf": {:hex, :exprotobuf, "0.8.3"},
+  "gpb": {:git, "git://github.com/tomas-abrahamsson/gpb.git", "cc12c0b642c294c66a10649e0b28b4edbe7483ae", []},
+  "libprotobuf": {:git, "https://github.com/TensorWrench/libprotobuf.git", "439c302c0eb9fb2070e44f86de167ba16f195354", []},
+  "triq": {:git, "git://github.com/krestenkrab/triq.git", "0c1a00d81d0cf58ffac0a4a73c3c70862b378e4e", [ref: ""]}}

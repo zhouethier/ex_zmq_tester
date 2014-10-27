@@ -9,7 +9,7 @@ defmodule ZmqPublisher do
   # public API
   def start_link(), do: start_link(%{})
   def start_link(args) do
-    GenServer.start_link(__MODULE__, [args], [name: __MODULE__])
+    GenServer.start_link(__MODULE__, [args], [name: PUB])
   end
 
   def send(pid, msg) when is_binary(msg) do
@@ -34,14 +34,7 @@ defmodule ZmqPublisher do
     :ok = :erlzmq.send(zmq_publisher, "header", [:sndmore])
     :ok = :erlzmq.send(zmq_publisher, msg)
 
-    # notify(msg)
-
     {:noreply, zmq_publisher}
   end
-
-  # defp notify(msg) do
-  #   Logger.debug "ZmqPublisher: notify #{inspect msg}"
-  #   {:ok, {:zmq_msg, msg}}
-  # end
 
 end

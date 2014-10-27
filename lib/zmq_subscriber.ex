@@ -1,7 +1,8 @@
+# Define a Subscriber
+
 defmodule ZmqSubscriber do
   use GenServer
   require Logger
-  # alias ZmqInterface.State
 
   # @ip "127.0.0.1"
   @sub_port "31285"
@@ -13,7 +14,7 @@ defmodule ZmqSubscriber do
   # public API
   def start_link(), do: start_link(%{})
   def start_link(args) do
-    GenServer.start_link(__MODULE__, [args])
+    GenServer.start_link(__MODULE__, [args], [name: SUB])
   end
 
   # GenServer Interface
@@ -22,13 +23,10 @@ defmodule ZmqSubscriber do
     {:ok, context} = :erlzmq.context()
     {:ok, zmq_subscriber} = :erlzmq.socket(context, [:sub, {:active, true}])
     :ok = :erlzmq.setsockopt(zmq_subscriber, :subscribe, <<>>)
-    sub_addr = 'tcp://*:#{port}'
+    sub_addr = 'tcp://*:#{port}'		# in Pub/Sub Module, Subscriber always "BIND" to all possible IP
     :ok = :erlzmq.bind(zmq_subscriber, sub_addr)
 
-    # loop(zmq_subscriber)
-
     Logger.debug "starting zmq_subscriber, binding to #{inspect sub_addr}"
-    # {:ok, %State{subscriber: zmq_subscriber}}
     {:ok, %State{socket: zmq_subscriber}}
   end
 
@@ -48,11 +46,4 @@ defmodule ZmqSubscriber do
     {:noreply, state}
   end
 
-  # private API
-  # defp loop(sub) do
-  #   {ok, data} = :erlzmq.recv(sub)
-  #   Logger.debug "ZmqSubscriber, recv data #{inspect data}"
-
-  #   loop(sub)
-  # end
 end
