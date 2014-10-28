@@ -16,6 +16,9 @@ defmodule ZmqPublisher do
     GenServer.cast(pid, {:send, msg})
   end
 
+  def send_multi(pid, hdr, msg) when is_binary(msg) do
+    GenServer.cast(pid, {:send_multi, hdr, msg})
+  end
   def start_scan(pid) do
     GenServer.cast(pid, {:start_scan})
   end
@@ -33,7 +36,22 @@ defmodule ZmqPublisher do
     {:ok, zmq_publisher}
   end
 
+	def handle_cast({:start_scan}, zmq_publisher) do
+		Logger.debug "ZmqPublisher: start_scan socket #{inspect zmq_publisher}"	
+
+		send_action_message_out(:start_scan, zmq_publisher)
+    {:noreply, zmq_publisher}
+	end
+		
   def handle_cast({:send, msg}, zmq_publisher) do
+    Logger.debug "ZmqPublisher: send message #{inspect msg}, socket #{inspect zmq_publisher}"	
+
+    :ok = :erlzmq.send(zmq_publisher, msg)
+
+    {:noreply, zmq_publisher}
+  end
+
+  def handle_cast({:send_multipart, msg}, zmq_publisher) do
     Logger.debug "ZmqPublisher: send message #{inspect msg}, socket #{inspect zmq_publisher}"	
 
     :ok = :erlzmq.send(zmq_publisher, "header", [:sndmore])
@@ -42,13 +60,13 @@ defmodule ZmqPublisher do
     {:noreply, zmq_publisher}
   end
 	
-	def handle_cast({:start_scan}, zmq_publisher) do
-		Logger.debug "ZmqPublisher: start_scan socket #{inspect zmq_publisher}"	
-
-		msg = ActionMessage.ActionMsg.new(type: :start_scan)
+	
+	# private APIs
+	defp send_action_message_out(type, socket) do
+		msg = ActionMessage.ActionMsg.new(type: type)
 		encoded_msg = ActionMessage.ActionMsg.encode(msg)
-		:ok = :erlzmq.send(zmq_publisher, encoded_msg)
-    {:noreply, zmq_publisher}
+		Logger.debug "...send_action_message_out, #{inspect type} #{inspect msg}"
+ 		:ok = :erlzmq.send(socket, encoded_msg)
   end
 
 end
