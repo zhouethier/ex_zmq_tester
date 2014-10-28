@@ -16,4 +16,5 @@ message ActionMsg {
 
 	optional ConfigType config_type = 3;
 
+	optional string ip = 4;
 }

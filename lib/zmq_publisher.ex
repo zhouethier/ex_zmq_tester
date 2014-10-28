@@ -4,7 +4,7 @@ defmodule ZmqPublisher do
   # alias ZmqInterface.State 
 
   @default_ip "127.0.0.1"
-  @sub_port "31285"
+  @pub_port "20174"
 
   # public API
   def start_link(), do: start_link(%{})
@@ -19,14 +19,14 @@ defmodule ZmqPublisher do
   def send_multi(pid, hdr, msg) when is_binary(msg) do
     GenServer.cast(pid, {:send_multi, hdr, msg})
   end
-  def start_scan(pid) do
-    GenServer.cast(pid, {:start_scan})
+  def start_scan(pid, ip) do
+    GenServer.cast(pid, {:start_scan, ip})
   end
 
   # GenServer Interface
   def init([args]) do
     ip = Map.get(args, :ip, @default_ip)
-    port = Map.get(args, :port, @sub_port)
+    port = Map.get(args, :port, @pub_port)
     {:ok, context} = :erlzmq.context()
     {:ok, zmq_publisher} = :erlzmq.socket(context, [:pub])
     pub_addr = 'tcp://#{ip}:#{port}'
@@ -36,10 +36,14 @@ defmodule ZmqPublisher do
     {:ok, zmq_publisher}
   end
 
-	def handle_cast({:start_scan}, zmq_publisher) do
+	def handle_cast({:start_scan, ip}, zmq_publisher) do
 		Logger.debug "ZmqPublisher: start_scan socket #{inspect zmq_publisher}"	
 
-		send_action_message_out(:start_scan, zmq_publisher)
+		msg = ActionMessage.ActionMsg.new(type: :start_scan, ip: ip)
+		encoded_msg = ActionMessage.ActionMsg.encode(msg)
+		Logger.debug "...send_action_message_out, #{inspect msg}"
+ 		:ok = :erlzmq.send(zmq_publisher, encoded_msg)
+
     {:noreply, zmq_publisher}
 	end
 		
@@ -61,12 +65,4 @@ defmodule ZmqPublisher do
   end
 	
 	
-	# private APIs
-	defp send_action_message_out(type, socket) do
-		msg = ActionMessage.ActionMsg.new(type: type)
-		encoded_msg = ActionMessage.ActionMsg.encode(msg)
-		Logger.debug "...send_action_message_out, #{inspect type} #{inspect msg}"
- 		:ok = :erlzmq.send(socket, encoded_msg)
-  end
-
 end
