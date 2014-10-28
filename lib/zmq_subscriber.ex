@@ -38,6 +38,10 @@ defmodule ZmqSubscriber do
   def handle_info(data = {:zmq, _socket, msg, _options}, state) do
     Logger.debug "ZmqSubscriber: handle incoming zmq_msg #{inspect data}"
     Logger.debug "ZmqSubscriber: message: #{inspect Enum.reverse([msg | state.data])}"
+		
+		decoded_msg = ActionMessage.ActionMsg.decode(msg)
+		Logger.debug "ZmqSubscriber: decoded msg #{inspect decoded_msg}"
+		
     {:noreply, %State{state | data: []}}
   end
 

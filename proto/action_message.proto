@@ -10,7 +10,7 @@ message ActionMsg {
 		lse_map = 2;
 	}
 	
-	required MessageType type = 1;
+	optional MessageType type = 1;
 	
 	optional string config_context = 2;
 

@@ -16,6 +16,10 @@ defmodule ZmqPublisher do
     GenServer.cast(pid, {:send, msg})
   end
 
+  def start_scan(pid) do
+    GenServer.cast(pid, {:start_scan})
+  end
+
   # GenServer Interface
   def init([args]) do
     ip = Map.get(args, :ip, @default_ip)
@@ -30,10 +34,20 @@ defmodule ZmqPublisher do
   end
 
   def handle_cast({:send, msg}, zmq_publisher) do
-    Logger.debug "ZmqPublisher: handle send... message #{inspect msg}, socket #{inspect zmq_publisher}"	
+    Logger.debug "ZmqPublisher: send message #{inspect msg}, socket #{inspect zmq_publisher}"	
+
     :ok = :erlzmq.send(zmq_publisher, "header", [:sndmore])
     :ok = :erlzmq.send(zmq_publisher, msg)
 
+    {:noreply, zmq_publisher}
+  end
+	
+	def handle_cast({:start_scan}, zmq_publisher) do
+		Logger.debug "ZmqPublisher: start_scan socket #{inspect zmq_publisher}"	
+
+		msg = ActionMessage.ActionMsg.new(type: :start_scan)
+		encoded_msg = ActionMessage.ActionMsg.encode(msg)
+		:ok = :erlzmq.send(zmq_publisher, encoded_msg)
     {:noreply, zmq_publisher}
   end
 
