@@ -5,35 +5,29 @@ A unittest to create a zmq PUB / SUB module, and communicate with protobuf style
 
 # To run the test
 ```
-$ iex -S mix
-iex(1)> {ok, pub} = ZmqPublisher.start_link
-iex(2)> ZmqSubscriber.start_link
-iex(3)> ZmqPublisher.start_scan(pub) 
+[~/Projects/ex_erlang/ex_zmq_tester]$ iex -S mix                                                                                                                                    [master][ruby-1.9.3-p0] 
+Erlang/OTP 17 [erts-6.1] [source] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false] [dtrace]
 
-Expected to see:
 
-iex(1)> {ok, pub} = ZmqPublisher.start_link
+14:15:28.160 [debug] starting publisher, connect to 'tcp://127.0.0.1:20174'
 
-10:48:40.027 [debug] starting publisher, connect to 'tcp://127.0.0.1:20174'
-{:ok, #PID<0.132.0>}
-iex(2)> ZmqSubscriber.start_link
-
-10:48:48.996 [debug] starting zmq_subscriber, binding to 'tcp://*:20174'
-{:ok, #PID<0.135.0>}
-iex(3)> ZmqPublisher.start_scan(pub) 
+14:15:28.161 [debug] starting zmq_subscriber, binding to 'tcp://*:20174'
+Interactive Elixir (1.1.0-dev) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> ZmqPublisher.start_scan(PUB, "configurations...")
 :ok
 
-10:48:57.037 [debug] ZmqPublisher: start_scan socket {1, ""}
-iex(4)> 
-10:48:57.054 [debug] ...send_action_message_out, %ActionMessage.ActionMsg{config_context: nil, config_type: nil, ip: nil, type: :start_scan}
+14:15:42.494 [debug] ZmqPublisher: start_scan socket {1, ""}
+iex(2)> 
+14:15:42.509 [debug] ...send_action_message_out, %ActionMessage.ActionMsg{config_context: "configurations...", config_type: nil, ip: nil, type: :start_scan}
 
-10:48:57.054 [debug] ZmqSubscriber: handle incoming zmq_msg {:zmq, {1, ""}, <<8, 1>>, []}
+14:15:42.509 [debug] ZmqSubscriber: handle incoming zmq_msg {:zmq, {1, ""}, <<8, 1, 18, 17, 99, 111, 110, 102, 105, 103, 117, 114, 97, 116, 105, 111, 110, 115, 46, 46, 46>>, []}
 
-10:48:57.054 [debug] ZmqSubscriber: message: [<<8, 1>>]
+14:15:42.509 [debug] ZmqSubscriber: message: [<<8, 1, 18, 17, 99, 111, 110, 102, 105, 103, 117, 114, 97, 116, 105, 111, 110, 115, 46, 46, 46>>]
 
-10:48:57.061 [debug] ZmqSubscriber: decoded msg %ActionMessage.ActionMsg{config_context: nil, config_type: nil, ip: nil, type: :start_scan}
+14:15:42.513 [debug] ZmqSubscriber: decoded msg %ActionMessage.ActionMsg{config_context: "configurations...", config_type: nil, ip: nil, type: :start_scan}
 
 nil
+iex(3)> 
 
 ```
 
