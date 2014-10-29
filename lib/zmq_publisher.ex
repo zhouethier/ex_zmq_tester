@@ -19,6 +19,11 @@ defmodule ZmqPublisher do
   def send_multi(pid, hdr, msg) when is_binary(msg) do
     GenServer.cast(pid, {:send_multi, hdr, msg})
   end
+
+  def start_scan(pid) do
+    GenServer.cast(pid, {:start_scan})
+  end
+
   def start_scan(pid, ip) do
     GenServer.cast(pid, {:start_scan, ip})
   end
@@ -36,17 +41,17 @@ defmodule ZmqPublisher do
     {:ok, zmq_publisher}
   end
 
-	def handle_cast({:start_scan, ip}, zmq_publisher) do
+	def handle_cast({:start_scan}, zmq_publisher) do
 		Logger.debug "ZmqPublisher: start_scan socket #{inspect zmq_publisher}"	
 
-		msg = ActionMessage.ActionMsg.new(type: :start_scan, ip: ip)
+		msg = ActionMessage.ActionMsg.new(type: :start_scan)
 		encoded_msg = ActionMessage.ActionMsg.encode(msg)
 		Logger.debug "...send_action_message_out, #{inspect msg}"
  		:ok = :erlzmq.send(zmq_publisher, encoded_msg)
 
     {:noreply, zmq_publisher}
 	end
-		
+
   def handle_cast({:send, msg}, zmq_publisher) do
     Logger.debug "ZmqPublisher: send message #{inspect msg}, socket #{inspect zmq_publisher}"	
 
