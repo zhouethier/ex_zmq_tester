@@ -13,7 +13,9 @@ defmodule ExZmqTester.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [applications: [:logger],
-     included_applications: [:libprotobuf, :erlzmq]
+     included_applications: [:libprotobuf, :erlzmq],
+     registered: [ZmqPublisher, ZmqSubscriber],
+     mod: {ExZmqTester, []}
 		]
   end
 
