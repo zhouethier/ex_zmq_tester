@@ -55,7 +55,7 @@ defmodule ZmqPublisher do
 	def handle_cast({:start_scan, config}, zmq_publisher) do
 		Logger.debug "ZmqPublisher: start_scan socket #{inspect zmq_publisher}"	
 
-		msg = ActionMessage.ActionMsg.new(type: :start_scan, config_context: config)
+		msg = ActionMessage.ActionMsg.new(action_type: :start_scan, configuration_content: config)
 		encoded_msg = ActionMessage.ActionMsg.encode(msg)
 		Logger.debug "...send_action_message_out, #{inspect msg}"
  		:ok = :erlzmq.send(zmq_publisher, encoded_msg)

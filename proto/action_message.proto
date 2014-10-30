@@ -1,20 +1,21 @@
 message ActionMsg {
-	enum MessageType {
+	enum ActionType {
 		start_scan = 1;
 		scan_completed = 2;
 		set_relay = 3;
 	}
 	
-	enum ConfigType {
+	enum ConfigFormat {
 		csv = 1;
 		lse_map = 2;
 	}
 	
-	optional MessageType type = 1;
+	required ActionType action_type = 1;
 	
-	optional string config_context = 2;
+	optional string configuration_content = 2;
 
-	optional ConfigType config_type = 3;
-
-	optional string ip = 4;
+	optional ConfigFormat configuration_format = 3;
+	
+	optional string scan_result = 4;
+	
 }
