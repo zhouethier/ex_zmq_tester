@@ -24,8 +24,8 @@ defmodule ZmqPublisher do
     GenServer.cast(pid, {:start_scan})
   end
 
-  def start_scan(pid, config) do
-    GenServer.cast(pid, {:start_scan, config})
+  def start_scan(pid, config_file) do
+    GenServer.cast(pid, {:start_scan, config_file})
   end
 
   # GenServer Interface
@@ -52,10 +52,12 @@ defmodule ZmqPublisher do
     {:noreply, zmq_publisher}
 	end
 
-	def handle_cast({:start_scan, config}, zmq_publisher) do
+	def handle_cast({:start_scan, config_file}, zmq_publisher) do
 		Logger.debug "ZmqPublisher: start_scan socket #{inspect zmq_publisher}"	
+		
+		config_content = parse_conf_file(config_file)
 
-		msg = ActionMessage.ActionMsg.new(action_type: :start_scan, configuration_content: config)
+		msg = ActionMessage.ActionMsg.new(action_type: :start_scan, configuration_content: config_content, configuration_format: :csv)
 		encoded_msg = ActionMessage.ActionMsg.encode(msg)
 		Logger.debug "...send_action_message_out, #{inspect msg}"
  		:ok = :erlzmq.send(zmq_publisher, encoded_msg)
@@ -79,6 +81,14 @@ defmodule ZmqPublisher do
 
     {:noreply, zmq_publisher}
   end
+
+	# private API	
+	defp parse_conf_file (file) do
+		conf_path = Path.join([__DIR__, "../csv_conf_file", file])
+		{:ok, content} = File.read(conf_path)
+	  Logger.debug("...parse_file, dir #{inspect conf_path}, content #{inspect content}")
+		content
+	end
 	
 	
 end
