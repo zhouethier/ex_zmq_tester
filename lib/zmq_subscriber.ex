@@ -5,7 +5,7 @@ defmodule ZmqSubscriber do
   require Logger
 
   # @ip "127.0.0.1"
-  @sub_port "20174"
+  @sub_port "31284"
 
   defmodule State do
     defstruct socket: nil, data: []

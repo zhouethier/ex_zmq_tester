@@ -37,7 +37,11 @@ defmodule ZmqPublisher do
     pub_addr = 'tcp://#{ip}:#{port}'
     :ok = :erlzmq.connect(zmq_publisher, pub_addr)	
 
-    Logger.debug "starting publisher, connect to #{inspect pub_addr}"
+    <<a::32, b::32, c::32>> = :crypto.rand_bytes(12)
+    :random.seed({a, b, c})
+		uid = :random.uniform(30000)
+		
+    Logger.debug "starting publisher, connect to #{inspect pub_addr}, uid #{inspect uid}"
     {:ok, zmq_publisher}
   end
 

@@ -8,8 +8,8 @@ defmodule ExZmqTester do
 
     children = [
       # Define workers and child supervisors to be supervised
-      worker(ZmqPublisher, [])
-      # worker(ZmqSubscriber, []) # we might have other SUB bind to the same port, thus only manually start SUB if needed
+      worker(ZmqPublisher, []),
+      worker(ZmqSubscriber, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/Supervisor.html
