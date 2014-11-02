@@ -20,5 +20,5 @@ message ActionMsg {
 	
 	optional string scan_status = 5;
 	
-	optional string uid = 6; 
+	optional string upstream_uid = 6; 
 }

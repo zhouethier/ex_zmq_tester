@@ -8,7 +8,7 @@ defmodule ZmqSubscriber do
   @sub_port "31284"
 
   defmodule State do
-    defstruct socket: nil, data: []
+    defstruct socket: nil, data: [], uid: ""
   end
 
   # public API

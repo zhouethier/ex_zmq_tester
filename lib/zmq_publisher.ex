@@ -6,6 +6,10 @@ defmodule ZmqPublisher do
   @default_ip "127.0.0.1"
   @pub_port "20174"
 
+  defmodule State do
+    defstruct socket: nil, upstream_uid: ""
+  end
+
   # public API
   def start_link(), do: start_link(%{})
   def start_link(args) do
@@ -18,10 +22,6 @@ defmodule ZmqPublisher do
 
   def send_multi(pid, hdr, msg) when is_binary(msg) do
     GenServer.cast(pid, {:send_multi, hdr, msg})
-  end
-
-  def start_scan(pid) do
-    GenServer.cast(pid, {:start_scan})
   end
 
   def start_scan(pid, config_file) do
@@ -42,48 +42,36 @@ defmodule ZmqPublisher do
 		uid = :random.uniform(30000)
 		
     Logger.debug "starting publisher, connect to #{inspect pub_addr}, uid #{inspect uid}"
-    {:ok, zmq_publisher}
+    {:ok,  %State{socket: zmq_publisher, upstream_uid: to_string(uid)}}
   end
 
-	def handle_cast({:start_scan}, zmq_publisher) do
-		Logger.debug "ZmqPublisher: start_scan socket #{inspect zmq_publisher}"	
-
-		msg = ActionMessage.ActionMsg.new(type: :start_scan)
-		encoded_msg = ActionMessage.ActionMsg.encode(msg)
-		Logger.debug "...send_action_message_out, #{inspect msg}"
- 		:ok = :erlzmq.send(zmq_publisher, encoded_msg)
-
-    {:noreply, zmq_publisher}
-	end
-
-	def handle_cast({:start_scan, config_file}, zmq_publisher) do
-		Logger.debug "ZmqPublisher: start_scan socket #{inspect zmq_publisher}"	
+	def handle_cast({:start_scan, config_file}, state) do
+		Logger.debug "ZmqPublisher: start_scan state #{inspect state}"	
 		
 		config_content = parse_conf_file(config_file)
 
-		msg = ActionMessage.ActionMsg.new(action_type: :start_scan, configuration_content: config_content, configuration_format: :csv)
+		msg = ActionMessage.ActionMsg.new(action_type: :start_scan, configuration_content: config_content, configuration_format: :csv, upstream_uid: state.upstream_uid)
 		encoded_msg = ActionMessage.ActionMsg.encode(msg)
 		Logger.debug "...send_action_message_out, #{inspect msg}"
- 		:ok = :erlzmq.send(zmq_publisher, encoded_msg)
+ 		:ok = :erlzmq.send(state.socket, encoded_msg)
 
-    {:noreply, zmq_publisher}
+    {:noreply, state}
 	end
 
-  def handle_cast({:send, msg}, zmq_publisher) do
-    Logger.debug "ZmqPublisher: send message #{inspect msg}, socket #{inspect zmq_publisher}"	
+  def handle_cast({:send, msg}, state) do
+    Logger.debug "ZmqPublisher: send message #{inspect msg}, state #{inspect state}"	
+    :ok = :erlzmq.send(state.socket, msg)
 
-    :ok = :erlzmq.send(zmq_publisher, msg)
-
-    {:noreply, zmq_publisher}
+    {:noreply, state}
   end
 
-  def handle_cast({:send_multipart, msg}, zmq_publisher) do
-    Logger.debug "ZmqPublisher: send message #{inspect msg}, socket #{inspect zmq_publisher}"	
+  def handle_cast({:send_multipart, msg}, state) do
+    Logger.debug "ZmqPublisher: send message #{inspect msg}, state #{inspect state}"	
 
-    :ok = :erlzmq.send(zmq_publisher, "header", [:sndmore])
-    :ok = :erlzmq.send(zmq_publisher, msg)
+    :ok = :erlzmq.send(state.socket, "header", [:sndmore])
+    :ok = :erlzmq.send(state.socket, msg)
 
-    {:noreply, zmq_publisher}
+    {:noreply, state}
   end
 
 	# private API	
