@@ -16,7 +16,7 @@ message ActionMsg {
 
 	optional ConfigFormat configuration_format = 3;
 	
-	optional string scan_result_summary = 4;
+	optional string diagnostic_data = 4;
 	
 	optional string scan_status = 5;
 	
