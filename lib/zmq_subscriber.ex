@@ -31,7 +31,7 @@ defmodule ZmqSubscriber do
   end
 
   def handle_info(data = {:zmq, _socket, msg, [:rcvmore | _rest]}, state) do
-    Logger.debug "ZmqSubscriber: rcvmore data: #{inspect data}"
+    # Logger.debug "ZmqSubscriber: rcvmore data: #{inspect data}"
     {:noreply, %State{state | data: [msg | state.data]}}
   end
 
@@ -40,7 +40,7 @@ defmodule ZmqSubscriber do
     #  Logger.debug "ZmqSubscriber: message: #{inspect Enum.reverse([msg | state.data])}"
  		
 		decoded_msg = ActionMessage.ActionMsg.decode(msg)
-		Logger.debug "ZmqSubscriber: recv msg #{inspect decoded_msg}"
+		# Logger.debug "ZmqSubscriber: recv msg #{inspect decoded_msg}"
 		
     {:noreply, %State{state | data: []}}
   end
@@ -48,6 +48,12 @@ defmodule ZmqSubscriber do
   def handle_info(msg, state) do
     Logger.debug "ZmqSubscriber: handle incoming msg #{inspect msg}"
     {:noreply, state}
+  end
+
+  def terminate(_reason, state) do
+		Logger.info "Terminating ZmqSubscriber."
+	  :erlzmq.close(state.socket)
+    :ok
   end
 
 end

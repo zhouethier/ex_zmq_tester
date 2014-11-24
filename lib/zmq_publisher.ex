@@ -50,7 +50,7 @@ defmodule ZmqPublisher do
 		
 		config_content = parse_conf_file(config_file)
 
-		msg = ActionMessage.ActionMsg.new(action_type: :start_scan, configuration_content: config_content, configuration_format: :csv, upstream_uid: state.upstream_uid)
+		msg = ActionMessage.ActionMsg.new(action_type: :start_scan, configuration_content: config_content, configuration_format: :csv, upstream_uid: state.upstream_uid, upstream_name: "ex_zmq_tester")
 		encoded_msg = ActionMessage.ActionMsg.encode(msg)
 		Logger.debug "...send_action_message_out, #{inspect msg}"
  		:ok = :erlzmq.send(state.socket, encoded_msg)
@@ -72,6 +72,12 @@ defmodule ZmqPublisher do
     :ok = :erlzmq.send(state.socket, msg)
 
     {:noreply, state}
+  end
+
+  def terminate(_reason, state) do
+		Logger.info "Terminating ZmqPublisher."
+	  :erlzmq.close(state.socket)
+    :ok
   end
 
 	# private API	

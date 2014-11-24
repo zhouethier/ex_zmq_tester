@@ -10,6 +10,11 @@ message ActionMsg {
 		lse_map = 2;
 	}
 	
+	enum SystemStatus {
+		idle = 1;
+		scanning = 2;
+	}
+	
 	required ActionType action_type = 1;
 	
 	optional string configuration_content = 2;
@@ -18,7 +23,9 @@ message ActionMsg {
 	
 	optional string diagnostic_data = 4;
 	
-	optional string scan_status = 5;
+	optional SystemStatus scan_status = 5;
 	
 	optional string upstream_uid = 6; 
+	
+	optional string upstream_name = 7;
 }
