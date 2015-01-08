@@ -40,7 +40,7 @@ defmodule ZmqSubscriber do
     #  Logger.debug "ZmqSubscriber: message: #{inspect Enum.reverse([msg | state.data])}"
  		
 		decoded_msg = ActionMessage.ActionMsg.decode(msg)
-		# Logger.debug "ZmqSubscriber: recv msg #{inspect decoded_msg}"
+			# Logger.debug "ZmqSubscriber: recv zmq msg #{inspect decoded_msg}"
 		
     {:noreply, %State{state | data: []}}
   end
