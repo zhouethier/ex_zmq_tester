@@ -13,6 +13,7 @@ message ActionMsg {
 	enum SystemStatus {
 		idle = 1;
 		scanning = 2;
+		done = 3;
 	}
 	
 	required ActionType action_type = 1;
@@ -28,4 +29,12 @@ message ActionMsg {
 	optional string upstream_uid = 6; 
 	
 	optional string upstream_name = 7;
+	
+	optional int32 diagnostic_data_expected_suuplies = 8;
+	
+	optional int32 diagnostic_data_found_suuplies = 9;
+	
+	optional int32 diagnostic_data_expected_fixtures = 10;
+	
+	optional int32 diagnostic_data_found_fixtures = 11;
 }
